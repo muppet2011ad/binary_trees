@@ -19,6 +19,7 @@ class Node:
         """
         self.left = None
         self.right = None
+        self.parent = None
         self.data = data
 
 
@@ -40,7 +41,7 @@ class Node:
                 return None, None
             return self.right.lookup(data, self)
         else:
-            return self, parent
+            return self, self.parent
 
     def refresh_parents(self):
         if self.left:
@@ -199,6 +200,7 @@ class Node:
             if data < self.data:
                 if self.left is None:
                     self.left = Node(data)
+                    self.left.parent = self
                 else:
                     self.left.insert(data)
             elif data > self.data:
@@ -206,6 +208,7 @@ class Node:
                     self.right = Node(data)
                 else:
                     self.right.insert(data)
+                    self.right.parent = self
         else:
             self.data = data
 
@@ -222,21 +225,49 @@ class Node:
 
 
     def rotate_right(self):
-        """
-        rotate the tree to the right such that this node becomes the right child of the new root
-        N.B you can't do self = new_root, so you will need to do:
-        self.data = new_root.data
-        self.left = new_root.left
-        self.right = new_root.right
-        self.parent = new_root.parent
-        """
+        print("Right rotate on", self)
+        if self.parent:
+            x = self.left
+            b = x.right
+            if self.parent.left == self:
+                self.parent.left = x
+            else:
+                self.parent.right = x
+            self.left = b
+            x.right = self
+        else:
+            x = self.left
+            a = x.left
+            b = x.right
+            c = self.right
+            t = x.data
+            x.data = self.data
+            self.data = t
+            self.left = a
+            self.right = x
+            self.right.left = b
+            self.right.right = c
 
     def rotate_left(self):
-        """
-        rotate the tree to the left such that this node becomes the left child of the new root
-        N.B you can't do self = new_root, so you will need to do:
-        self.data = new_root.data
-        self.left = new_root.left
-        self.right = new_root.right
-        self.parent = new_root.parent
-        """
+        print("Left rotate on", self)
+        if self.parent:
+            y = self.right
+            b = y.left
+            if self.parent.left == self:
+                self.parent.left = y
+            else:
+                self.parent.right = y
+            self.right = b
+            y.left = self
+        else:
+            y = self.right
+            a = self.left
+            b = y.left
+            c = y.right
+            t = y.data
+            y.data = self.data
+            self.data = t
+            self.right = c
+            self.left = y
+            y.left = a
+            y.right = b
